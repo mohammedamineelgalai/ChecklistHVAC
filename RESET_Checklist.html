@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réinitialiser Checklist - XNRGY</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #0c5460;
+        }
+        button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+        button.safe {
+            background: #28a745;
+        }
+        button.safe:hover {
+            background: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        ul {
+            text-align: left;
+            margin: 15px 0;
+        }
+        li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Réinitialiser la Checklist HVAC/AHU</h1>
+        
+        <div class="warning">
+            <strong>⚠️ ATTENTION!</strong>
+            <p>Cette opération va supprimer <strong>TOUTES</strong> les données sauvegardées:</p>
+            <ul>
+                <li>❌ Tous les modules créés</li>
+                <li>❌ Toutes les réponses aux checkpoints</li>
+                <li>❌ Les checkpoints personnalisés (Admin)</li>
+                <li>❌ L'utilisateur connecté</li>
+            </ul>
+            <p><strong>Les 147 checkpoints originaux seront restaurés.</strong></p>
+        </div>
+
+        <div class="info">
+            <strong>ℹ️ Pourquoi faire ça?</strong>
+            <p>Si vous voyez seulement 24 checkpoints au lieu de 147, c'est que d'anciennes données sont sauvegardées dans votre navigateur. Cette réinitialisation corrige le problème.</p>
+        </div>
+
+        <button onclick="resetAll()" id="resetBtn">
+            🗑️ RÉINITIALISER TOUTES LES DONNÉES
+        </button>
+
+        <button onclick="openChecklist()" class="safe">
+            ✅ Ouvrir la Checklist
+        </button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function resetAll() {
+            if (!confirm('Êtes-vous SÛR de vouloir tout supprimer? Cette action est IRRÉVERSIBLE!')) {
+                return;
+            }
+
+            try {
+                // Supprimer toutes les données localStorage
+                localStorage.removeItem('allCheckpoints');
+                localStorage.removeItem('modules');
+                localStorage.removeItem('currentUser');
+                
+                // Message de succès
+                const resultDiv = document.getElementById('result');
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `
+                    ✅ <strong>Réinitialisation réussie!</strong><br>
+                    Les 147 checkpoints ont été restaurés.<br>
+                    <br>
+                    <strong>Prochaine étape:</strong> Cliquez sur "Ouvrir la Checklist" pour démarrer.
+                `;
+                
+                // Désactiver le bouton
+                document.getElementById('resetBtn').disabled = true;
+                document.getElementById('resetBtn').style.opacity = '0.5';
+                document.getElementById('resetBtn').style.cursor = 'not-allowed';
+                
+            } catch (error) {
+                const resultDiv = document.getElementById('result');
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    ❌ <strong>Erreur:</strong><br>
+                    ${error.message}
+                `;
+            }
+        }
+
+        function openChecklist() {
+            window.location.href = 'Checklist HVACAHU - By Mohammed Amine Elgalai.html';
+        }
+
+        // Afficher l'état actuel
+        window.onload = function() {
+            const checkpoints = localStorage.getItem('allCheckpoints');
+            const modules = localStorage.getItem('modules');
+            const user = localStorage.getItem('currentUser');
+            
+            let status = '<div class="info"><strong>État actuel du navigateur:</strong><ul>';
+            
+            if (checkpoints) {
+                const count = JSON.parse(checkpoints).length;
+                status += `<li>📋 Checkpoints sauvegardés: <strong>${count}</strong></li>`;
+            } else {
+                status += `<li>📋 Checkpoints: <em>Aucun (utilisera les 147 originaux)</em></li>`;
+            }
+            
+            if (modules) {
+                const count = JSON.parse(modules).length;
+                status += `<li>📁 Modules sauvegardés: <strong>${count}</strong></li>`;
+            } else {
+                status += `<li>📁 Modules: <em>Aucun</em></li>`;
+            }
+            
+            if (user) {
+                const userData = JSON.parse(user);
+                status += `<li>👤 Utilisateur: <strong>${userData.name}</strong></li>`;
+            } else {
+                status += `<li>👤 Utilisateur: <em>Non connecté</em></li>`;
+            }
+            
+            status += '</ul></div>';
+            
+            document.querySelector('.container').insertAdjacentHTML('afterbegin', status);
+        };
+    </script>
+</body>
+</html>
